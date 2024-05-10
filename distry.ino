@@ -1,9 +1,11 @@
 #include <FastLED.h>
+#include "pitches.h"
 
 #define LAMP_PIN    12
-#define MOTOR1_PIN1 10
-#define MOTOR1_PIN2 11
-#define MOTOR1_PWM  3
+// change this to make the song slower or faster
+int tempo = 114;
+// change this to whichever pin you want to use
+int buzzer = 3;
 #define MOTOR2_PIN1 8
 #define MOTOR2_PIN2 9
 
@@ -13,7 +15,6 @@
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];
-
 #define UPDATES_PER_SECOND 100
 
 // This example shows several ways to set up and use 'palettes' of colors
@@ -46,21 +47,35 @@ bool lampFlag=true;
 bool ledStripFlag=true;
 bool curtainFlag=true;
 bool fanFlag=true;
+bool musicFlag=true;
+
+int melody[] = {
+
+  // Never Gonna Give You Up - Rick Astley
+  // Score available at https://musescore.com/chlorondria_5/never-gonna-give-you-up_alto-sax
+  // Arranged by Chlorondria
+
+  NOTE_D5,-4, NOTE_E5,-4, NOTE_A4,4, //1
+  NOTE_E5,-4, NOTE_FS5,-4, NOTE_A5,16, NOTE_G5,16, NOTE_FS5,8,
+  NOTE_D5,-4, NOTE_E5,-4, NOTE_A4,2,
+  NOTE_A4,16, NOTE_A4,16, NOTE_B4,16, NOTE_D5,8, NOTE_D5,16,
+  NOTE_D5,-4, NOTE_E5,-4, NOTE_A4,4, //repeat from 1
+  NOTE_E5,-4, NOTE_FS5,-4, NOTE_A5,16, NOTE_G5,16, NOTE_FS5,8,
+  NOTE_D5,-4, NOTE_E5,-4, NOTE_A4,2,
+  };
 
 
 void setup() {
-    delay( 2000 ); // power-up safety delay
+    delay( 1000 ); // power-up safety delay
     FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
     FastLED.setBrightness(BRIGHTNESS);
     currentPalette = RainbowColors_p;
     currentBlending = LINEARBLEND;
 
     pinMode(LAMP_PIN,OUTPUT);
-    pinMode(MOTOR1_PIN1,OUTPUT);
-    pinMode(MOTOR1_PIN2,OUTPUT);
     pinMode(MOTOR2_PIN1,OUTPUT);
-    pinMode(MOTOR1_PIN2,OUTPUT);
-    pinMode(MOTOR1_PWM,OUTPUT);
+    pinMode(MOTOR2_PIN2,OUTPUT);
+    pinMode(buzzer,OUTPUT);
 
     Serial.begin(9600);
 
@@ -93,20 +108,10 @@ void loop()
       ledStripFlag=!ledStripFlag;
     }
     else if(num==4){
-      if(fanFlag){
-        digitalWrite(MOTOR1_PIN1,HIGH);
-        digitalWrite(MOTOR1_PIN2,LOW);
-        analogWrite(MOTOR1_PWM,50);
-      }
-      else{
-        digitalWrite(MOTOR1_PIN1,LOW);
-        digitalWrite(MOTOR1_PIN2,LOW);
-        analogWrite(MOTOR1_PWM,0);
-      }
-      fanFlag=!fanFlag;
+      // add
     }
     else if(num==5){
-      if(curtainFlag){
+      if(fanFlag){
         digitalWrite(MOTOR2_PIN1,HIGH);
         digitalWrite(MOTOR2_PIN2,LOW);
       }
@@ -114,11 +119,10 @@ void loop()
         digitalWrite(MOTOR2_PIN1,LOW);
         digitalWrite(MOTOR2_PIN2,LOW);
       }
-      curtainFlag=!curtainFlag;
+      fanFlag=!fanFlag;
     }
     else if(num==6){
-      //
-      digitalWrite(2,LOW);
+      playMusic();
     }
   }
   delay(100);
@@ -229,6 +233,36 @@ const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM =
     CRGB::Black
 };
 
+void playMusic(){
+  int notes = sizeof(melody) / sizeof(melody[0]) / 2;
+
+// this calculates the duration of a whole note in ms
+int wholenote = (60000 * 4) / tempo;
+
+int divider = 0, noteDuration = 0;
+for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
+
+    // calculates the duration of each note
+    divider = melody[thisNote + 1];
+    if (divider > 0) {
+      // regular note, just proceed
+      noteDuration = (wholenote) / divider;
+    } else if (divider < 0) {
+      // dotted notes are represented with negative durations!!
+      noteDuration = (wholenote) / abs(divider);
+      noteDuration *= 1.5; // increases the duration in half for dotted notes
+    }
+
+    // we only play the note for 90% of the duration, leaving 10% as a pause
+    tone(buzzer, melody[thisNote], noteDuration * 0.9);
+
+    // Wait for the specief duration before playing the next note.
+    delay(noteDuration);
+
+    // stop the waveform generation before the next note.
+    noTone(buzzer);
+  }
+}
 
 
 // Additionl notes on FastLED compact palettes:
