@@ -66,10 +66,18 @@ void setup() {
 
 }
 
-
+void wavyColor(){
+    ChangePalettePeriodically();
+    FastLED.show();
+    FastLED.delay(1000 / UPDATES_PER_SECOND);
+    static uint8_t startIndex = 0;
+    startIndex = startIndex + 1; /* motion speed */
+    FillLEDsFromPaletteColors( startIndex);
+}
 void loop()
 {
-    if (Serial.available()) {
+  if(ledStripFlag) wavyColor();
+  if (Serial.available()) {
     String num_str = Serial.readStringUntil('\n'); 
     int num = num_str.toInt();
     if(num==2){
@@ -78,19 +86,8 @@ void loop()
       lampFlag=!lampFlag;
     }
     else if(num==3){
-      if(ledStripFlag){
-        ChangePalettePeriodically();
-        FastLED.show();
-        FastLED.delay(1000 / UPDATES_PER_SECOND);
-        static uint8_t startIndex = 0;
-        startIndex = startIndex + 1; /* motion speed */
-        FillLEDsFromPaletteColors( startIndex);
-      }
-      else{
-        // for(int i=0;i<NUM_LEDS;i++){
-        //   led
-        // }
-        FastLED.clear();
+      if(ledStripFlag) {
+        fill_solid(leds, NUM_LEDS, CRGB::Black);
         FastLED.show();
       }
       ledStripFlag=!ledStripFlag;
@@ -124,7 +121,7 @@ void loop()
       digitalWrite(2,LOW);
     }
   }
-  delay(1000);
+  delay(100);
 }
 
 void FillLEDsFromPaletteColors( uint8_t colorIndex)
