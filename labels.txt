@@ -1,0 +1,6 @@
+0 No Gesture
+1 Thumbs Up
+2 Thumbs Down
+3 Palm Spread
+4 Ok
+5 Rock
