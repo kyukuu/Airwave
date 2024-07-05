@@ -6,6 +6,8 @@
 int tempo = 114;
 // change this to whichever pin you want to use
 int buzzer = 3;
+#define MOTOR1_PIN1 10
+#define MOTOR1_PIN2 11
 #define MOTOR2_PIN1 8
 #define MOTOR2_PIN2 9
 
@@ -75,6 +77,8 @@ void setup() {
     pinMode(LAMP_PIN,OUTPUT);
     pinMode(MOTOR2_PIN1,OUTPUT);
     pinMode(MOTOR2_PIN2,OUTPUT);
+    pinMode(MOTOR1_PIN1,OUTPUT);
+    pinMode(MOTOR1_PIN2,OUTPUT);
     pinMode(buzzer,OUTPUT);
 
     Serial.begin(9600);
@@ -108,7 +112,20 @@ void loop()
       ledStripFlag=!ledStripFlag;
     }
     else if(num==4){
-      // add
+      // if(fanFlag){
+      digitalWrite(MOTOR1_PIN1,LOW);
+      digitalWrite(MOTOR1_PIN2,HIGH);
+      delay(750);
+      digitalWrite(MOTOR1_PIN1,LOW);
+      digitalWrite(MOTOR1_PIN2,LOW);
+      // digitalWrite(MOTOR1_PIN1,LOW);
+      // digitalWrite(MOTOR1_PIN2,LOW);
+      // }
+      // else{
+      //   digitalWrite(MOTOR2_PIN1,LOW);
+      //   digitalWrite(MOTOR2_PIN2,LOW);
+      // }
+      // fanFlag=!fanFlag;
     }
     else if(num==5){
       if(fanFlag){
@@ -263,4 +280,3 @@ for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
     noTone(buzzer);
   }
 }
-

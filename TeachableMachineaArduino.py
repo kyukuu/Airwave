@@ -1,19 +1,19 @@
 # Programa modificado por Diego Ojeda a partir del codigo de Michael D'Argenio
 # Podeís encontrar el código original aquí: https://www.hackster.io/mjdargen/easy-object-detection-with-teachable-machine-python-d4063b
 
-
 import numpy as np
 import cv2
-import tensorflow.keras as tf
+import tensorflow as myTensor
 import math
 import os
 import serial
 import time
 
+tf = myTensor.keras
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
-arduino = serial.Serial(port='COM8', baudrate=9600, timeout=.1)#definimos nuestro arduino
+arduino = serial.Serial(port='COM13', baudrate=9600, timeout=.1)#definimos nuestro arduino
 
 def main():
 
@@ -52,7 +52,7 @@ def main():
 
     # keeps program running forever until ctrl+c or window is closed
     while True:
-        time.sleep(2)
+        # time.sleep(2)
         # disable scientific notation for clarity
         np.set_printoptions(suppress=True)
 
